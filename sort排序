@@ -1,0 +1,522 @@
+package Sort;
+
+import java.util.ArrayList;
+
+public class Test {
+    public static void main(String[] args) {
+        test01();
+    }
+
+    public static void test01() {
+        int[] arr = {18, 23, 2, 34, 555, 21, 29, 21};
+        int[] arr2 = {23,};
+        //int[] arr={2,3,1,6};
+        //System.out.println(arr.length); 7
+        //sort s = new sort();
+        //s.bubble_sort(arr);//victory
+        //s.select_sort(arr);//victory
+        //s.insert_sort(arr);//成功
+        //s.binaryInsert_sort(arr); //成功
+        //s.quick_sort(arr);//victory
+        //s.shell_sort(arr);//victory
+        //s.heap_sort(arr2);
+        //s.merge_sort(arr2);//failure 1.0
+        // s.LSD_sort(arr);
+        //以上均是成功案例
+        for (int j : arr) {
+            System.out.println(j);
+        }
+
+    }
+
+    public static void test02() {
+        int[] arr = {18, 23, 2, 34, 5, 21, 29, 21};
+        int[] temp = new int[arr.length];
+        sort s = new sort();
+        s.merge(0, 4, arr.length - 1, temp, arr);
+        for (int i = 0; i < arr.length; i++) {
+            System.out.println(arr[i]);
+        }
+    }
+}
+
+class sort {
+    public void bubble_sort(int[] arr) {
+        for (int i = 0; i < arr.length; i++) {//不是arr.length-1,因为已经小于了,而不是小于等于
+            for (int j = 0; j < arr.length - 1 - i; j++) {
+                if (arr[j] > arr[j + 1]) {//最大的最先找到位置
+                    int temp = arr[j];
+                    arr[j] = arr[j + 1];
+                    arr[j + 1] = temp;
+                }
+            }
+        }
+    }
+
+    public void select_sort(int[] arr) {
+
+        for (int i = 0; i < arr.length; i++) {
+            int min = i;
+            for (int j = i + 1; j < arr.length; j++) {
+                if (arr[min] > arr[j]) {
+                    min = j;
+                }
+            }
+            int temp = arr[i];
+            arr[i] = arr[min];
+            arr[min] = temp;
+        }
+    }
+
+    public void insert_sort(int[] arr) {
+        for (int i = 1; i < arr.length; i++) {///不能是arr.length-1
+            int temp = arr[i];
+            /*for(int j=i-1;j>=0;j--){
+                if(arr[j]>temp){
+                    arr[j+1]=arr[j];
+                }
+            }*/
+            int j = i - 1;
+            while (j >= 0 && arr[j] > temp) {
+                arr[j + 1] = arr[j];
+                j--;
+            }
+            arr[j + 1] = temp;
+        }
+    }
+
+    public void binaryInsert_sort(int[] arr) {
+        for (int i = 1; i < arr.length; i++) {
+            int temp = arr[i];
+            int loc = mid_search(temp, arr,i);
+            for (int j = i; j > loc; j--) {//bug 一定要从后往前交换
+                arr[j] = arr[j - 1];
+            }
+            arr[loc] = temp;
+        }
+    }
+
+    public int mid_search(int x, int[] arr,int len) {//arr一定要是有序的
+        int low = 0;
+        int high = len - 1;
+        while (low < high) {
+            int mid = (low + high) / 2;
+            if (arr[mid] == x) {
+                return mid;
+            } else if (arr[mid] > x) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        if (arr[low] == x) {
+            return low + 1;
+        } else if (arr[low] > x) {
+            return low;
+        } else {//arr[low]<x
+            return low + 1;
+        }
+    }
+
+    public void merge_sort(int[] arr) {
+        int[] temp = new int[arr.length];
+        merge_sort_(0, arr.length - 1, arr, temp);
+    }
+
+    private void merge_sort_(int low, int high, int[] arr, int[] temp) {
+        if (low < high) {
+            int mid = (high + low) / 2;
+            merge_sort_(low, mid, arr, temp);
+            merge_sort_(mid + 1, high, arr, temp);
+            merge(low, mid, high, temp, arr);
+        }
+    }
+
+    private void _merge_sort_() {
+
+    }//非递归算法
+
+    /*private void merge(int low,int mid,int high,int[] arr){
+        int[] temp=new int[arr.length];
+        if (high + 1 - low >= 0) System.arraycopy(arr, low, temp, low, high + 1 - low);
+        int i=low,j=mid,k=low;
+        while(i<mid && j<high){
+            if(arr[i]<=arr[j]){
+                temp[k]=arr[i];
+                i++;
+            }else{
+                temp[k]=arr[j];
+                j++;
+            }
+            k++;
+        }
+        while(i<mid){
+            temp[k]=arr[i];
+            k++;
+            i++;
+        }
+        while(j<high){
+            temp[k]=arr[j];
+            k++;
+            j++;
+        }
+        if (arr.length - low >= 0) System.arraycopy(temp, low, arr, low, arr.length - low);
+    }
+
+    //failure 1.0
+*/
+    public void merge(int low, int mid, int high, int[] temp, int[] arr) {
+        /*int tmp=low;
+        while(low<mid && mid<high){//bug arr[mid]越界了
+            if(arr[low]<=arr[mid])
+                temp[tmp++]=arr[low++];
+            else
+                temp[tmp++]=arr[mid++];
+        }
+        while(low<=mid-1){
+            temp[tmp++]=arr[low++];
+        }
+        while(mid<=high){
+            temp[tmp++]=arr[mid++];
+        }
+        */
+        /*for(int i=high;i>=low;i--){
+            arr[i]=temp[i];
+        }*//*
+        for(int i=0;i<high-low+1;i++,high--){
+            arr[high]=temp[high];
+        }*/
+        //以上失败在于忽视了mid在不断增加
+        int tmp = mid + 1;
+        int k = 0;
+        int s = low;
+        while (low <= mid && tmp <= high) {//mid不变
+            if (arr[low] < arr[tmp])
+                temp[k++] = arr[low++];
+            else
+                temp[k++] = arr[tmp++];
+        }
+        while (low <= mid)
+            temp[k++] = arr[low++];
+        while (tmp <= high)
+            temp[k++] = arr[tmp++];
+        for (int i = s; i <= high; i++) {
+            arr[i] = temp[i - s];
+        }
+    }//victory 4.0
+
+    public void shell_sort(int[] arr) {
+        //设置d1=7/2=3,arr的长度为7
+        //(2.0) 优化:d--变为d/2;
+        int d = arr.length / 2;
+        while (d != 0) {
+            for (int i = 0; i + d < arr.length; i++) {
+                if (arr[i] > arr[i + d]) {
+                    int temp = arr[i];
+                    arr[i] = arr[i + d];
+                    arr[i + d] = temp;
+                }
+            }
+            d = d / 2;
+        }
+    }
+
+    /*private class heap{//建立最大堆
+        private int[] arr;
+        private int size;
+        public void buildheap(int[] a){
+            arr=new int[a.length+1];
+            System.arraycopy(a, 0, arr, 1, arr.length - 1);
+            //复制数组
+            size=a.length;
+            for(int i=size;i>=2;i--){
+                if(arr[i]>arr[i/2]){
+                    swap(i,i/2);
+                }
+            }
+        }
+        public void swap(int i,int j){
+            int temp=arr[i];
+            arr[i]=arr[j];
+            arr[j]=temp;
+        }
+        public void sink(int i,int j){
+            while(2*i<j){
+                if(2*i+1<=j){
+                    int mixIndex=arr[2*i]>arr[2*i+1]?2*i:2*i+1;
+                    if(arr[mixIndex]>arr[i])
+                        swap(i,mixIndex);
+                    i=mixIndex;
+                }else{
+                    if(arr[2*i]>arr[i]){
+                        swap(2*i,i);
+                    }
+                    i=2*i;
+                }
+            }
+        }
+        public int[] getArr(){
+            return this.arr;
+        }
+    }*///failure 1.0
+    /*private class heap{//建立最大堆
+        private int[] arr;
+        public void buildheap(int[] a){
+            arr=new int[a.length+1];
+            System.arraycopy(a, 0, arr, 1, a.length);
+            for(int i=(arr.length-1)/2;i>=1;i--){
+                adjustHeap(i,arr.length-1,arr);
+            }
+        }
+        public void adjustHeap(int k,int len,int[] arr){
+            arr[0]=arr[k];
+            for(int i=2*k;i<=len;i*=2){
+                if(i+1<=len && arr[i+1]>arr[i]){
+                    i++;
+                }
+                if(arr[0]>=arr[i])
+                    break;
+                else{
+                    arr[k]=arr[i];
+                    k=i;
+                }
+            }
+            arr[k]=arr[0];
+        }
+        public void swap(int i,int j,int[] arr){
+            int temp=arr[i];
+            arr[i]=arr[j];
+            arr[j]=temp;
+        }
+        public int[] getArr(){
+            return arr;
+        }
+    }
+    */
+    /*public void heap_sort(int[] a){
+        heap h=new heap();
+        h.buildheap(a);
+        int k=0;
+        while(k!= h.getArr().length-1){
+            h.swap(1,h.getArr().length-k);
+            h.sink(1,h.getArr().length-k);
+            k++;
+        }
+        System.arraycopy(h.getArr(), 1, a, 0, a.length);
+    }*/
+    /*//failure 1.0
+    public void heap_sort(int[] a){
+        heap h=new heap();
+        h.buildheap(a);
+        int k=0;
+        while(k!=h.getArr().length-1){
+            h.swap(1,h.getArr().length-k-1,h.getArr());
+            k++;
+            h.adjustHeap((h.getArr().length-k-1)/2,h.getArr().length-k-1,h.getArr());
+        }
+        System.arraycopy(h.getArr(), 1, a, 0, a.length);
+    }*/
+    private class heap {
+        public int[] arr;
+
+        public heap(int[] arr) {
+            this.arr = new int[arr.length + 1];
+            System.arraycopy(arr, 0, this.arr, 1, arr.length);
+        }
+
+        /*public void buildHeap(int[] a){//建立大根堆
+            arr=new int[a.length+1];
+            System.arraycopy(a, 0, arr, 1, a.length);
+            for(int i=(arr.length-1)/2;i>=1;i--){
+                heapAdjust(i,arr.length-1);
+            }
+        }*/
+        public void buildHeap() {//建立大根堆
+
+            for (int i = (arr.length - 1) / 2; i >= 1; i--) {
+                heapAdjust(i, arr.length - 1);
+            }
+        }
+
+        void swap(int i, int j) {
+            int temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+
+        //void swap_(int )
+        void heapAdjust(int k, int len) {//len代表最后一个元素
+            arr[0] = arr[k];
+            for (int i = 2 * k; i <= len; i *= 2) {
+                if (i + 1 <= len && arr[i + 1] > arr[i]) {
+                    i++;
+                }
+                /*if(i<len &&arr[i+1]>arr[i]){
+                    i++;
+                }*/
+               /* if(arr[k]>=arr[i])       //bug
+                    break;*/
+                if (arr[0] >= arr[i])
+                    break;
+                else {
+                    arr[k] = arr[i];
+                    k = i;
+                }
+            }
+            arr[k] = arr[0];
+            //以上是成功的
+            /*int temp = arr[k];
+            while (2 * k <= len)
+            {
+                if (2 * k + 1 < len) {
+                    int maxIndex = arr[k * 2] < arr[k * 2 + 1] ? k* 2 + 1 : k * 2;
+                    if (arr[maxIndex] > temp) {
+                        swap(maxIndex, k);
+                        k = maxIndex;
+                    }
+                    else{
+                        break;
+                    }
+                }
+                else {
+                    if (arr[2 * k] > temp) {
+                        swap(2 * k, k);
+                        k = 2 * k;
+                    }
+                    else{
+                        break;
+                    }
+                }
+            }*/
+            //以上是失败的
+        }
+    }
+
+
+    public void heap__sort(int[] arr) {
+        heap h = new heap(arr);
+        h.buildHeap();
+        /*for (int i = 0; i < h.arr.length; i++) {
+            System.out.println(h.arr[i]);
+        }*///以上victory
+        for (int i = arr.length; i >= 1; i--) {
+            h.swap(1, i);
+            //h.heapAdjust((i-1)/2,i-1);//bug 不能从i-1/2调整,从1开始调整,否则就要调整很多遍
+            h.heapAdjust(1, i - 1);
+        }
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = h.arr[i + 1];
+        }
+    }//victory
+
+
+    //更简单的堆排序
+    public void heapAdjust(int k, int end, int[] arr) {//将堆调整为大根堆
+        //1,首先存储要改变的元素
+        int temp = arr[k];
+        //2.找到他最大的儿子
+        for (int i = 2 * k + 1; i <= end; i = 2 * i + 1) {//i=2*i+1保证i下一个是它的左儿子
+            if (i + 1 <= end && arr[i + 1] > arr[i])
+                i++;
+            if (arr[i] > arr[k]) {
+                //进行交换
+                int tmp = arr[i];
+                arr[i] = arr[k];
+                arr[k] = tmp;
+                k = i;
+            } else {
+                break;
+            }
+        }
+        arr[k] = temp;
+    }
+
+    public void heap_sort(int[] arr) {
+        //1,建堆
+        for (int i = (arr.length - 1) / 2; i >= 0; i--) {
+            heapAdjust(i, arr.length - 1, arr);
+        }
+        //2.排序
+        for (int i = 0; i < arr.length; i++) {
+            //交换
+            int temp = arr[0];
+            arr[0] = arr[arr.length - 1 - i];
+            arr[arr.length - 1 - i] = temp;
+            heapAdjust(0, arr.length - 2 - i, arr);
+        }
+    }
+
+    public void quick_sort(int[] arr) {
+        quick_sort_(0, arr.length - 1, arr);
+    }
+
+    private void quick_sort_(int low, int high, int[] arr) {
+        if (low < high) {//这个很重要,不然无限递归
+            int mid = part(low, high, arr);
+            quick_sort_(low, mid - 1, arr);
+            quick_sort_(mid + 1, high, arr);
+        }
+    }
+
+    private static int part(int low, int high, int[] arr) {
+        int pivot = arr[low];
+        while (low < high) {
+            // while (low < high && arr[high] > pivot)//bug:在于如果数组中有相同的元素,那么无限递归
+            while (low < high && arr[high] >= pivot)
+                --high;
+            arr[low] = arr[high];
+            //while (low < high && arr[low] < pivot)//bug
+            while (low < high && arr[low] <= pivot)
+                ++low;
+            arr[high] = arr[low];
+        }
+        arr[low] = pivot;
+        return low;
+    }
+
+    public void LSD_sort(int[] a) {//低位优先
+        ArrayList<Integer>[] first = new ArrayList[10];//个位
+        for (int i = 0; i < 10; i++) {
+            first[i] = new ArrayList<>();
+        }
+        ArrayList<Integer>[] second = new ArrayList[10];//十位
+        for (int i = 0; i < 10; i++) {
+            second[i] = new ArrayList<>();
+        }
+        ArrayList<Integer>[] third = new ArrayList[10];//百位
+        for (int i = 0; i < 10; i++) {
+            third[i] = new ArrayList<>();
+        }
+        for (int i = 0; i < a.length; i++) {
+            int temp = a[i] % 10;
+            first[temp].add(a[i]);
+        }
+        for (int i = 0; i < first.length; i++) {
+            if (first[i].size() != 0) {
+                for (int j = 0; j < first[i].size(); j++) {
+                    int temp = (first[i].get(j) % 100) / 10;
+                    second[temp].add(first[i].get(j));
+                }
+            }
+        }
+        for (int i = 0; i < second.length; i++) {
+            if (second[i].size() != 0) {
+                for (int j = 0; j < second[i].size(); j++) {
+                    int temp = second[i].get(j) / 100;
+                    third[temp].add(second[i].get(j));
+                }
+            }
+        }
+        int k = 0;
+        for (int i = 0; i < third.length; i++) {
+            if (third[i].size() != 0) {
+                for (int j = 0; j < third[i].size(); j++) {
+                    a[k++] = third[i].get(j);
+                }
+            }
+        }
+
+
+    }
+}
+
